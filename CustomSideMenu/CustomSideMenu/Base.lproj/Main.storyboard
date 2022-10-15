@@ -98,6 +98,7 @@
                     <navigationItem key="navigationItem" id="Gkf-cL-KKV"/>
                     <connections>
                         <outlet property="homeContainerView" destination="3gb-P6-CTD" id="zHC-we-4p2"/>
+                        <outlet property="mainContainerView" destination="8bC-Xf-vdC" id="nwN-KK-W6C"/>
                         <outlet property="menuTableView" destination="UeR-Ne-glM" id="xpN-LD-ct3"/>
                     </connections>
                 </viewController>

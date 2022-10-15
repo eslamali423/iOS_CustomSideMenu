@@ -12,6 +12,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var menuTableView: UITableView!
     var menuItems = ["Home", "Settings", "Profile", "Terms an c Conditions", "Privacy Policy" ]
     
+    @IBOutlet var mainContainerView: UIView!
     @IBOutlet weak var homeContainerView: UIView!
     
     
@@ -49,6 +50,7 @@ class ViewController: UIViewController {
     private func configureSwapGestureRecognizer(){
          swipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(didSwipe(_:)))
         homeContainerView.addGestureRecognizer(swipeGestureRecognizer)
+        mainContainerView.addGestureRecognizer(swipeGestureRecognizer)
     }
     
     
@@ -64,18 +66,19 @@ class ViewController: UIViewController {
         let scaledTransform = origialTransform.scaledBy(x:  0.8, y: 0.8 )
         let scaledAndTraslatedTransform = scaledTransform.translatedBy (x: x, y: 0)
         
-        UIView.animate(withDuration: 0.7) {
+        UIView.animate(withDuration: 0.4) {
             self.homeContainerView.transform = scaledAndTraslatedTransform
         }
+        isMenuOppend = true
     }
     
     private func hideMenu(){
-        
-        
-        UIView.animate(withDuration: 0.7) {
+    
+        UIView.animate(withDuration: 0.4) {
             self.homeContainerView.transform = self.home
             self.homeContainerView.layer.cornerRadius = 0
         }
+        isMenuOppend = false
     }
     
     
@@ -83,17 +86,16 @@ class ViewController: UIViewController {
         print("menu button tapped")
         if isMenuOppend == false {
             showMenu()
-            isMenuOppend = true
         }else {
             hideMenu()
-            isMenuOppend = false
         }
     }
     @objc private func didSwipe (_ sender : UISwipeGestureRecognizer){
-        print("swaiped happend ")
+
         if isMenuOppend == false, swipeGestureRecognizer.direction == .right {
             showMenu()
-            isMenuOppend = true
+        }else if isMenuOppend == true{
+            hideMenu()
         }
     }
     
@@ -101,7 +103,6 @@ class ViewController: UIViewController {
         
         if isMenuOppend == true {
             hideMenu()
-            isMenuOppend = false
         }
     }
     
@@ -131,7 +132,9 @@ extension ViewController : UITableViewDelegate, UITableViewDataSource {
         // TODO:- Navigation action
         print("tapped: \(menuItems[indexPath.row ])")
         // this for example
-        if indexPath.row == 1 {
+        if indexPath.row == 0 {
+            hideMenu()
+        }else if indexPath.row == 1 {
             let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
             
             self.navigationController?.pushViewController(vc, animated: true)
