@@ -12,11 +12,24 @@ class ViewController: UIViewController {
     @IBOutlet weak var menuTableView: UITableView!
     var menuItems = ["Home", "Settings", "Profile", "Terms an c Conditions", "Privacy Policy" ]
     
+    @IBOutlet weak var homeContainerView: UIView!
+    
+    
+    var isMenuOppend = false // false because first time will be closed
+    let screen =  UIScreen.main.bounds // shortcut for screen bounds
+    var home = CGAffineTransform()  // to go back to home easyer when side menu is shown
+    
+    var swipeGestureRecognizer : UISwipeGestureRecognizer!
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        // set the initial position for the screen to be home container view
+        home = homeContainerView.transform
+        configureNavBar()
         configureTableView()
+        configureSwapGestureRecognizer()
+        configureTapRecognizer()
         // Do any additional setup after loading the view.
     }
     
@@ -24,6 +37,75 @@ class ViewController: UIViewController {
         menuTableView.delegate = self
         menuTableView.dataSource = self
     }
+    
+    private func configureNavBar(){
+        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        self.navigationController?.navigationBar.shadowImage = UIImage()
+        self.navigationController?.navigationBar.isTranslucent = true
+        self.navigationController?.view.backgroundColor = .clear
+        
+    }
+    
+    private func configureSwapGestureRecognizer(){
+         swipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(didSwipe(_:)))
+        homeContainerView.addGestureRecognizer(swipeGestureRecognizer)
+    }
+    
+    
+    private func configureTapRecognizer(){
+        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapHome))
+        homeContainerView.addGestureRecognizer(tapRecognizer)
+    }
+    
+    private func showMenu(){
+        homeContainerView.layer.cornerRadius = 40
+        let x = screen.width * 0.8
+        let origialTransform = self.homeContainerView.transform
+        let scaledTransform = origialTransform.scaledBy(x:  0.8, y: 0.8 )
+        let scaledAndTraslatedTransform = scaledTransform.translatedBy (x: x, y: 0)
+        
+        UIView.animate(withDuration: 0.7) {
+            self.homeContainerView.transform = scaledAndTraslatedTransform
+        }
+    }
+    
+    private func hideMenu(){
+        
+        
+        UIView.animate(withDuration: 0.7) {
+            self.homeContainerView.transform = self.home
+            self.homeContainerView.layer.cornerRadius = 0
+        }
+    }
+    
+    
+    @IBAction func didTapMenuButton(_ sender: Any) {
+        print("menu button tapped")
+        if isMenuOppend == false {
+            showMenu()
+            isMenuOppend = true
+        }else {
+            hideMenu()
+            isMenuOppend = false
+        }
+    }
+    @objc private func didSwipe (_ sender : UISwipeGestureRecognizer){
+        print("swaiped happend ")
+        if isMenuOppend == false, swipeGestureRecognizer.direction == .right {
+            showMenu()
+            isMenuOppend = true
+        }
+    }
+    
+    @objc private func didTapHome(_ sender :UITapGestureRecognizer){
+        
+        if isMenuOppend == true {
+            hideMenu()
+            isMenuOppend = false
+        }
+    }
+    
+    
 
 
 }
@@ -38,6 +120,7 @@ extension ViewController : UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         cell.configureCell(itemName: menuItems[indexPath.row])
+        cell.separatorInset = UIEdgeInsets(top: 0, left: cell.frame.width, bottom: 0, right: 0)
         return cell
         
     }
@@ -48,8 +131,8 @@ extension ViewController : UITableViewDelegate, UITableViewDataSource {
         // TODO:- Navigation action
         print("tapped: \(menuItems[indexPath.row ])")
         // this for example
-        if indexPath.row == 0 {
-            let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "HomeViewController") as! HomeViewController
+        if indexPath.row == 1 {
+            let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
             
             self.navigationController?.pushViewController(vc, animated: true)
         }
